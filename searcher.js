@@ -1,84 +1,54 @@
-// searcher.js — CSW24 subanagram finder
-// Loads CSW24.txt from GitHub (one word per line)
-// Query: letters + '?' for blanks.
-// Returns ALL valid words formable from any subset of tiles,
-// grouped by word length (descending).
-
 const WORD_LIST_URL =
   "https://raw.githubusercontent.com/katamorphism/searcherism/refs/heads/main/CSW24.txt";
 
-let allWords = null; // flat array of uppercase words
+let wordSet = null;
 
 async function loadWordList() {
   const res = await fetch(WORD_LIST_URL);
   if (!res.ok) throw new Error(`Failed to fetch word list: ${res.status}`);
   const text = await res.text();
+  wordSet = new Set(text.split(/\r?\n/).map(w => w.trim().toUpperCase()).filter(Boolean));
+}
 
-  allWords = [];
-  for (const raw of text.split(/\r?\n/)) {
-    const word = raw.trim().toUpperCase();
-    if (word) allWords.push(word);
+function* permutations(arr) {
+  if (arr.length <= 1) { yield arr; return; }
+  for (let i = 0; i < arr.length; i++) {
+    const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+    for (const perm of permutations(rest)) yield [arr[i], ...perm];
   }
 }
 
-/**
- * Check if a word can be formed from the available letters + blanks.
- * Both fixedSorted and wordLetters should be pre-sorted arrays.
- */
-function canMake(fixedSorted, blanks, wordLetters) {
-  // Both arrays are sorted. Walk them together like a merge:
-  // advance fi past letters that are smaller than what we need,
-  // consume a match when equal, or spend a blank otherwise.
-  let fi = 0;
-  let blanksUsed = 0;
-  for (let ni = 0; ni < wordLetters.length; ni++) {
-    // Skip over fixed letters that are alphabetically before what we need
-    while (fi < fixedSorted.length && fixedSorted[fi] < wordLetters[ni]) fi++;
-    if (fi < fixedSorted.length && fixedSorted[fi] === wordLetters[ni]) {
-      fi++;
-    } else {
-      blanksUsed++;
-      if (blanksUsed > blanks) return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Find all valid CSW24 words that can be made from any subset of the query tiles.
- * @param {string} query - Letters with '?' as blanks.
- * @returns {Map<number, string[]>} Map of length => sorted words, keys descending.
- */
 function search(query) {
-  if (!allWords) throw new Error("Word list not loaded yet.");
+  if (!wordSet) throw new Error("Word list not loaded yet.");
 
-  const upper = query.toUpperCase();
-  const letters = upper.split("");
-  const blanks = letters.filter((c) => c === "?").length;
-  const fixed = letters.filter((c) => c !== "?").sort();
+  const letters = query.toUpperCase().split("");
   const maxLen = letters.length;
+  const results = new Set();
 
-  // Group results by length
-  const byLength = new Map();
+  // Try every subset of the letters (all sizes from 2 up to maxLen)
+  // For each subset, try all permutations and check against wordSet
+  const n = letters.length;
+  for (let mask = 1; mask < (1 << n); mask++) {
+    const subset = [];
+    for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(letters[i]);
+    if (subset.length < 2) continue;
 
-  for (const word of allWords) {
-    if (word.length > maxLen || word.length < 2) continue;
-    const wordLetters = word.split("").sort();
-    if (canMake(fixed, blanks, wordLetters)) {
-      if (!byLength.has(word.length)) byLength.set(word.length, []);
-      byLength.get(word.length).push(word);
+    const seen = new Set();
+    for (const perm of permutations(subset)) {
+      const word = perm.join("");
+      if (seen.has(word)) continue;
+      seen.add(word);
+      if (wordSet.has(word)) results.add(word);
     }
   }
 
-  // Sort each group alphabetically
+  const byLength = new Map();
+  for (const word of results) {
+    if (!byLength.has(word.length)) byLength.set(word.length, []);
+    byLength.get(word.length).push(word);
+  }
   for (const [, words] of byLength) words.sort();
-
-  // Return as a Map with keys sorted descending (longest first)
-  const sorted = new Map(
-    [...byLength.entries()].sort((a, b) => b[0] - a[0])
-  );
-
-  return sorted;
+  return new Map([...byLength.entries()].sort((a, b) => b[0] - a[0]));
 }
 
 export { loadWordList, search };
