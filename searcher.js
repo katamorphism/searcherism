@@ -1,9 +1,3 @@
-// searcher.js — CSW24 subanagram finder
-// Loads CSW24.txt from GitHub (one word per line)
-// Query: letters + '?' for blanks.
-// Returns ALL valid words formable from any subset of tiles,
-// grouped by word length (descending).
-
 const WORD_LIST_URL =
   "https://raw.githubusercontent.com/katamorphism/searcherism/refs/heads/main/CSW24.txt";
 
