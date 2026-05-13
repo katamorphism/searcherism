@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>searcherism</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0e0f13;
+      --surface:   #16181f;
+      --border:    #2a2d38;
+      --accent:    #7effd4;
+      --accent2:   #ff6b9d;
+      --text:      #e8eaf0;
+      --muted:     #6b7080;
+      --tile-bg:   #1e2130;
+      --tile-hover:#252a3a;
+      --radius:    12px;
+      --font:      'Comfortaa', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 64px;
+      min-height: 100vh;
+    }
+
+    /* ── header ── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeDown .5s ease both;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    h1 span {
+      color: var(--accent2);
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: .95rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* ── search box ── */
+    .search-wrap {
+      width: 100%;
+      max-width: 560px;
+      animation: fadeDown .5s .1s ease both;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      padding: 14px 20px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      text-transform: uppercase;
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--muted);
+      letter-spacing: 1px;
+      font-weight: 300;
+      text-transform: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(126,255,212,.12);
+    }
+
+    button#go {
+      background: var(--accent);
+      color: #0a0b0e;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 14px 22px;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+    }
+
+    button#go:hover { background: #5fffca; }
+    button#go:active { transform: scale(.96); }
+    button#go:disabled { background: var(--border); color: var(--muted); cursor: default; }
+
+    .hint {
+      margin-top: 10px;
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .hint b { color: var(--accent2); font-weight: 600; }
+
+    /* ── status / loading ── */
+    #status {
+      margin-top: 36px;
+      font-size: .9rem;
+      color: var(--muted);
+      min-height: 1.4em;
+      text-align: center;
+      animation: fadeDown .4s ease both;
+    }
+
+    #status.error { color: var(--accent2); }
+
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* ── results ── */
+    #results-area {
+      width: 100%;
+      max-width: 700px;
+      margin-top: 32px;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 18px;
+      animation: fadeDown .35s ease both;
+    }
+
+    .results-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .count-badge {
+      background: var(--accent);
+      color: #0a0b0e;
+      font-size: .75rem;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 2px 10px;
+    }
+
+    #word-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .word-tile {
+      background: var(--tile-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text);
+      cursor: default;
+      transition: background .15s, border-color .15s, transform .1s;
+      animation: popIn .25s ease both;
+    }
+
+    .word-tile:hover {
+      background: var(--tile-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .no-results {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 300;
+      margin-top: 8px;
+    }
+
+    /* ── animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* stagger word tiles */
+    #word-grid .word-tile:nth-child(1)  { animation-delay: .02s }
+    #word-grid .word-tile:nth-child(2)  { animation-delay: .04s }
+    #word-grid .word-tile:nth-child(3)  { animation-delay: .06s }
+    #word-grid .word-tile:nth-child(4)  { animation-delay: .08s }
+    #word-grid .word-tile:nth-child(5)  { animation-delay: .10s }
+    #word-grid .word-tile:nth-child(6)  { animation-delay: .12s }
+    #word-grid .word-tile:nth-child(7)  { animation-delay: .14s }
+    #word-grid .word-tile:nth-child(8)  { animation-delay: .16s }
+    #word-grid .word-tile:nth-child(9)  { animation-delay: .18s }
+    #word-grid .word-tile:nth-child(10) { animation-delay: .20s }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>searcher<span>ism</span></h1>
+    <p class="subtitle">CSW24 anagram unscrambler</p>
+  </header>
+
+  <div class="search-wrap">
+    <div class="input-row">
+      <input
+        type="text"
+        id="query"
+        placeholder="e.g. OIREATE or NO?"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="characters"
+        spellcheck="false"
+        maxlength="20"
+      />
+      <button id="go" disabled>find</button>
+    </div>
+    <p class="hint">use <b>?</b> as a blank tile &nbsp;·&nbsp; letters only, any order</p>
+  </div>
+
+  <div id="status"><span class="loader"></span> loading CSW24&hellip;</div>
+
+  <div id="results-area" hidden>
+    <div class="results-header">
+      <h2>matches</h2>
+      <span class="count-badge" id="count">0</span>
+    </div>
+    <div id="word-grid"></div>
+  </div>
+
+  <script type="module">
+    import { loadWordList, search } from "./searcher.js";
+
+    const queryEl  = document.getElementById("query");
+    const goBtn    = document.getElementById("go");
+    const statusEl = document.getElementById("status");
+    const resultsArea = document.getElementById("results-area");
+    const wordGrid = document.getElementById("word-grid");
+    const countEl  = document.getElementById("count");
+
+    // ── Load word list on startup ──
+    (async () => {
+      try {
+        await loadWordList();
+        statusEl.textContent = "CSW24 ready — " + "go ahead and search";
+        goBtn.disabled = false;
+        queryEl.focus();
+      } catch (e) {
+        statusEl.textContent = "⚠ could not load CSW24.txt";
+        statusEl.classList.add("error");
+        console.error(e);
+      }
+    })();
+
+    // ── Search ──
+    function doSearch() {
+      const q = queryEl.value.trim();
+      if (!q) return;
+
+      resultsArea.hidden = true;
+      wordGrid.innerHTML = "";
+
+      try {
+        const words = search(q);
+        countEl.textContent = words.length;
+
+        if (words.length === 0) {
+          wordGrid.innerHTML = `<p class="no-results">no words found for <strong>${q.toUpperCase()}</strong></p>`;
+        } else {
+          statusEl.textContent = "";
+          for (const w of words) {
+            const tile = document.createElement("div");
+            tile.className = "word-tile";
+            tile.textContent = w;
+            wordGrid.appendChild(tile);
+          }
+        }
+
+        resultsArea.hidden = false;
+      } catch (e) {
+        statusEl.textContent = e.message;
+        statusEl.classList.add("error");
+      }
+    }
+
+    goBtn.addEventListener("click", doSearch);
+    queryEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") doSearch();
+    });
+  </script>
+
+</body>
+</html>
