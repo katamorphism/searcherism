@@ -1,3 +1,9 @@
+// searcher.js — CSW24 subanagram finder
+// Loads CSW24.txt from GitHub (one word per line)
+// Query: letters + '?' for blanks.
+// Returns ALL valid words formable from any subset of tiles,
+// grouped by word length (descending).
+
 const WORD_LIST_URL =
   "https://raw.githubusercontent.com/katamorphism/searcherism/refs/heads/main/CSW24.txt";
 
@@ -20,9 +26,14 @@ async function loadWordList() {
  * Both fixedSorted and wordLetters should be pre-sorted arrays.
  */
 function canMake(fixedSorted, blanks, wordLetters) {
+  // Both arrays are sorted. Walk them together like a merge:
+  // advance fi past letters that are smaller than what we need,
+  // consume a match when equal, or spend a blank otherwise.
   let fi = 0;
   let blanksUsed = 0;
   for (let ni = 0; ni < wordLetters.length; ni++) {
+    // Skip over fixed letters that are alphabetically before what we need
+    while (fi < fixedSorted.length && fixedSorted[fi] < wordLetters[ni]) fi++;
     if (fi < fixedSorted.length && fixedSorted[fi] === wordLetters[ni]) {
       fi++;
     } else {
