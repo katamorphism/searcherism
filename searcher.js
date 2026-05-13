@@ -10,43 +10,43 @@ async function loadWordList() {
   wordSet = new Set(text.split(/\r?\n/).map(w => w.trim().toUpperCase()).filter(Boolean));
 }
 
-function* permutations(arr) {
-  if (arr.length <= 1) { yield arr; return; }
-  for (let i = 0; i < arr.length; i++) {
-    const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
-    for (const perm of permutations(rest)) yield [arr[i], ...perm];
+// Check if word can be made from available letters + blanks.
+// Simple: for each letter in word, consume it from a copy of available counts,
+// or spend a blank if not available.
+function canMake(letters, blanks, word) {
+  const avail = {};
+  for (const c of letters) avail[c] = (avail[c] || 0) + 1;
+  let blanksLeft = blanks;
+  for (const c of word) {
+    if (avail[c] > 0) {
+      avail[c]--;
+    } else if (blanksLeft > 0) {
+      blanksLeft--;
+    } else {
+      return false;
+    }
   }
+  return true;
 }
 
 function search(query) {
   if (!wordSet) throw new Error("Word list not loaded yet.");
 
-  const letters = query.toUpperCase().split("");
-  const maxLen = letters.length;
-  const results = new Set();
+  const upper = query.toUpperCase();
+  const blanks = upper.split("").filter(c => c === "?").length;
+  const letters = upper.split("").filter(c => c !== "?");
+  const maxLen = upper.length;
 
-  // Try every subset of the letters (all sizes from 2 up to maxLen)
-  // For each subset, try all permutations and check against wordSet
-  const n = letters.length;
-  for (let mask = 1; mask < (1 << n); mask++) {
-    const subset = [];
-    for (let i = 0; i < n; i++) if (mask & (1 << i)) subset.push(letters[i]);
-    if (subset.length < 2) continue;
+  const byLength = new Map();
 
-    const seen = new Set();
-    for (const perm of permutations(subset)) {
-      const word = perm.join("");
-      if (seen.has(word)) continue;
-      seen.add(word);
-      if (wordSet.has(word)) results.add(word);
+  for (const word of wordSet) {
+    if (word.length < 2 || word.length > maxLen) continue;
+    if (canMake(letters, blanks, word)) {
+      if (!byLength.has(word.length)) byLength.set(word.length, []);
+      byLength.get(word.length).push(word);
     }
   }
 
-  const byLength = new Map();
-  for (const word of results) {
-    if (!byLength.has(word.length)) byLength.set(word.length, []);
-    byLength.get(word.length).push(word);
-  }
   for (const [, words] of byLength) words.sort();
   return new Map([...byLength.entries()].sort((a, b) => b[0] - a[0]));
 }
