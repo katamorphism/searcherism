@@ -190,8 +190,8 @@
 
     #word-grid {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      flex-direction: column;
+      gap: 0;
     }
 
     .word-tile {
@@ -237,17 +237,27 @@
       to { transform: rotate(360deg); }
     }
 
-    /* stagger word tiles */
-    #word-grid .word-tile:nth-child(1)  { animation-delay: .02s }
-    #word-grid .word-tile:nth-child(2)  { animation-delay: .04s }
-    #word-grid .word-tile:nth-child(3)  { animation-delay: .06s }
-    #word-grid .word-tile:nth-child(4)  { animation-delay: .08s }
-    #word-grid .word-tile:nth-child(5)  { animation-delay: .10s }
-    #word-grid .word-tile:nth-child(6)  { animation-delay: .12s }
-    #word-grid .word-tile:nth-child(7)  { animation-delay: .14s }
-    #word-grid .word-tile:nth-child(8)  { animation-delay: .16s }
-    #word-grid .word-tile:nth-child(9)  { animation-delay: .18s }
-    #word-grid .word-tile:nth-child(10) { animation-delay: .20s }
+    .length-heading {
+      width: 100%;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 24px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown .3s ease both;
+    }
+
+    .length-heading:first-child { margin-top: 0; }
+
+    .tile-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -287,18 +297,18 @@
   <script type="module">
     import { loadWordList, search } from "./searcher.js";
 
-    const queryEl  = document.getElementById("query");
-    const goBtn    = document.getElementById("go");
-    const statusEl = document.getElementById("status");
+    const queryEl    = document.getElementById("query");
+    const goBtn      = document.getElementById("go");
+    const statusEl   = document.getElementById("status");
     const resultsArea = document.getElementById("results-area");
-    const wordGrid = document.getElementById("word-grid");
-    const countEl  = document.getElementById("count");
+    const wordGrid   = document.getElementById("word-grid");
+    const countEl    = document.getElementById("count");
 
     // ── Load word list on startup ──
     (async () => {
       try {
         await loadWordList();
-        statusEl.textContent = "CSW24 ready — " + "go ahead and search";
+        statusEl.textContent = "CSW24 ready — go ahead and search";
         goBtn.disabled = false;
         queryEl.focus();
       } catch (e) {
@@ -317,18 +327,36 @@
       wordGrid.innerHTML = "";
 
       try {
-        const words = search(q);
-        countEl.textContent = words.length;
+        const byLength = search(q); // Map<number, string[]>, descending keys
 
-        if (words.length === 0) {
+        let total = 0;
+        for (const words of byLength.values()) total += words.length;
+        countEl.textContent = total;
+
+        if (total === 0) {
           wordGrid.innerHTML = `<p class="no-results">no words found for <strong>${q.toUpperCase()}</strong></p>`;
         } else {
           statusEl.textContent = "";
-          for (const w of words) {
-            const tile = document.createElement("div");
-            tile.className = "word-tile";
-            tile.textContent = w;
-            wordGrid.appendChild(tile);
+          let tileIndex = 0;
+          for (const [len, words] of byLength) {
+            // length heading
+            const heading = document.createElement("div");
+            heading.className = "length-heading";
+            heading.textContent = `${len} letter${len === 1 ? "" : "s"}`;
+            wordGrid.appendChild(heading);
+
+            // tiles row
+            const row = document.createElement("div");
+            row.className = "tile-row";
+            for (const w of words) {
+              const tile = document.createElement("div");
+              tile.className = "word-tile";
+              tile.style.animationDelay = `${Math.min(tileIndex * 0.018, 0.4)}s`;
+              tile.textContent = w;
+              row.appendChild(tile);
+              tileIndex++;
+            }
+            wordGrid.appendChild(row);
           }
         }
 
