@@ -10,7 +10,7 @@
     body { font-family: 'Comfortaa', sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; position: relative; }
 
     /* mode switcher */
-    .mode-switcher { position: fixed; top: 24px; left: 24px; display: flex; gap: 0; }
+    .mode-switcher { position: fixed; top: 24px; left: 24px; display: flex; }
     .mode-btn { font-family: inherit; font-size: .75rem; padding: 4px 12px; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #888; letter-spacing: 1px; text-transform: uppercase; transition: all .15s; }
     .mode-btn:first-child { border-radius: 6px 0 0 6px; }
     .mode-btn:last-child { border-radius: 0 6px 6px 0; border-left: none; }
@@ -22,7 +22,8 @@
     /* search mode */
     .input-row { display: flex; gap: 8px; }
     input[type=text] { font-family: inherit; font-size: 1.2rem; padding: 8px; flex: 1; text-transform: uppercase; }
-    button.action { font-family: inherit; font-size: 1rem; padding: 8px 16px; cursor: pointer; }
+    button.action { font-family: inherit; font-size: 1rem; padding: 8px 16px; cursor: pointer; border: 1px solid #ccc; background: #fff; }
+    button.action:hover:not(:disabled) { background: #f5f5f5; }
     button:disabled { opacity: .4; cursor: default; }
     .hint { font-size: .8rem; color: #888; margin: 6px 0 0; }
     #status { color: #888; margin: 16px 0; }
@@ -35,28 +36,31 @@
     #bingo-panel.visible { display: block; }
     #search-panel.hidden { display: none; }
 
-    .band-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center; }
-    .band-label { font-size: .8rem; color: #888; margin-right: 4px; }
-    .band-btn { font-family: inherit; font-size: .75rem; padding: 4px 10px; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #555; border-radius: 4px; transition: all .15s; }
-    .band-btn.active { background: #222; color: #fff; border-color: #222; }
+    .range-row { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+    .range-label { font-size: .8rem; color: #888; }
+    .range-row input[type=number] { font-family: inherit; font-size: .85rem; padding: 4px 6px; width: 80px; border: 1px solid #ccc; }
+    .range-row .sep { font-size: .85rem; color: #aaa; }
+    .range-row button.action { font-size: .8rem; padding: 5px 14px; }
 
     .rack-display { display: flex; gap: 8px; justify-content: center; margin: 28px 0 20px; flex-wrap: wrap; }
-    .rack-tile { width: 52px; height: 52px; border: 2px solid #222; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; letter-spacing: 0; border-radius: 4px; background: #fafafa; transition: transform .2s; }
+    .rack-tile { width: 52px; height: 52px; border: 2px solid #222; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; border-radius: 4px; background: #fafafa; transition: transform .2s; }
     .rack-tile:hover { transform: translateY(-3px); }
 
-    .bingo-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    #bingo-guess { font-family: inherit; font-size: 1.2rem; padding: 8px; flex: 1; text-transform: uppercase; border: 1px solid #ccc; }
-    #bingo-guess.correct { border-color: #22c55e; background: #f0fdf4; }
-    #bingo-guess.wrong { border-color: #ef4444; background: #fef2f2; animation: shake .3s; }
+    .answer-boxes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .answer-row { display: flex; gap: 8px; align-items: center; }
+    .answer-label { font-size: .75rem; color: #aaa; min-width: 72px; }
+    .answer-input { font-family: inherit; font-size: 1.1rem; padding: 7px 8px; flex: 1; text-transform: uppercase; border: 1px solid #ccc; }
+    .answer-input.correct { border-color: #22c55e; background: #f0fdf4; }
+    .answer-input.wrong { border-color: #ef4444; background: #fef2f2; animation: shake .3s; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
     .bingo-feedback { font-size: .95rem; min-height: 1.4em; margin-bottom: 12px; }
     .bingo-feedback.correct { color: #16a34a; }
     .bingo-feedback.wrong { color: #dc2626; }
+    .bingo-feedback.info { color: #888; }
 
     .bingo-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .bingo-stat { font-size: .8rem; color: #888; margin-top: 16px; }
-
     #bingo-status { color: #888; margin: 10px 0; font-size: .9rem; }
     .reveal-word { font-family: inherit; font-size: .8rem; padding: 4px 10px; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #888; border-radius: 4px; }
     .reveal-word:hover { border-color: #999; color: #333; }
@@ -90,25 +94,20 @@
   <div id="bingo-panel">
     <p class="subtitle">7-letter bingo trainer · CSW24</p>
 
-    <div class="band-row">
-      <span class="band-label">difficulty:</span>
-      <button class="band-btn active" data-band="0">top 1–1000</button>
-      <button class="band-btn" data-band="1">1k–5k</button>
-      <button class="band-btn" data-band="2">5k–10k</button>
-      <button class="band-btn" data-band="3">10k–20k</button>
-      <button class="band-btn" data-band="4">20k+</button>
+    <div class="range-row">
+      <span class="range-label">rank range:</span>
+      <input type="number" id="range-lo" value="1" min="1" />
+      <span class="sep">–</span>
+      <input type="number" id="range-hi" value="1000" min="1" />
+      <button class="action" id="range-go">go</button>
     </div>
 
     <div id="bingo-status">loading word list…</div>
-
     <div class="rack-display" id="rack-display"></div>
-
-    <div class="bingo-input-row">
-      <input type="text" id="bingo-guess" placeholder="unscramble it…" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" maxlength="7" disabled />
-      <button class="action" id="bingo-submit" disabled>guess</button>
-    </div>
+    <div class="answer-boxes" id="answer-boxes"></div>
     <div class="bingo-feedback" id="bingo-feedback"></div>
     <div class="bingo-actions">
+      <button class="action" id="bingo-submit" disabled>guess</button>
       <button class="action" id="bingo-next" disabled>next word</button>
       <button class="reveal-word" id="bingo-reveal" disabled>reveal</button>
     </div>
@@ -131,7 +130,6 @@ function comb(n, k) {
   for (let i = 0; i < k; i++) r = r * BigInt(n - i) / BigInt(i + 1);
   return r;
 }
-
 const DENOM = comb(TOTAL, 7);
 
 function wordProbability(word) {
@@ -141,50 +139,56 @@ function wordProbability(word) {
     if (!BAG[c] || BAG[c] < cnt) return 0;
   }
   let num = 1n;
-  for (const [c, cnt] of Object.entries(freq)) {
-    num *= comb(BAG[c], cnt);
-  }
+  for (const [c, cnt] of Object.entries(freq)) num *= comb(BAG[c], cnt);
   return Number(num * 10000000000n / DENOM) / 10000000000;
 }
 
-// ── Shared word list ──────────────────────────────────────────────────────────
+// ── Word list ─────────────────────────────────────────────────────────────────
 const WORD_LIST_URL = "https://raw.githubusercontent.com/katamorphism/searcherism/refs/heads/main/CSW24.txt";
 let wordSet = null;
 let rankedBingos = null;
+let anagramMap = null; // sorted-letters key -> [words]
 
 async function loadWordList() {
   const res = await fetch(WORD_LIST_URL);
-  if (!res.ok) throw new Error(`Failed to fetch word list: ${res.status}`);
+  if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
   const text = await res.text();
   wordSet = new Set(text.split(/\r?\n/).map(w => w.trim().toUpperCase()).filter(Boolean));
 }
 
 function buildBingoList() {
   if (rankedBingos) return;
-  const sevens = [...wordSet].filter(w => w.length === 7);
-  const withProb = sevens.map(w => ({ word: w, prob: wordProbability(w) }))
-                         .filter(x => x.prob > 0);
+  anagramMap = new Map();
+  for (const w of wordSet) {
+    if (w.length !== 7) continue;
+    const key = w.split('').sort().join('');
+    if (!anagramMap.has(key)) anagramMap.set(key, []);
+    anagramMap.get(key).push(w);
+  }
+  // one entry per alphagram, ranked by probability
+  const seen = new Set();
+  const withProb = [];
+  for (const w of wordSet) {
+    if (w.length !== 7) continue;
+    const key = w.split('').sort().join('');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const prob = wordProbability(w);
+    if (prob > 0) withProb.push({ key, prob });
+  }
   withProb.sort((a, b) => b.prob - a.prob);
   withProb.forEach((x, i) => x.rank = i + 1);
   rankedBingos = withProb;
 }
 
-const BANDS = [
-  [0, 1000],
-  [1000, 5000],
-  [5000, 10000],
-  [10000, 20000],
-  [20000, Infinity],
-];
-
 // ── Search logic ──────────────────────────────────────────────────────────────
 function canMake(letters, blanks, word) {
   const avail = {};
   for (const c of letters) avail[c] = (avail[c] || 0) + 1;
-  let blanksLeft = blanks;
+  let bl = blanks;
   for (const c of word) {
     if (avail[c] > 0) avail[c]--;
-    else if (blanksLeft > 0) blanksLeft--;
+    else if (bl > 0) bl--;
     else return false;
   }
   return true;
@@ -248,25 +252,26 @@ queryEl.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); })
 // ── Bingo UI ──────────────────────────────────────────────────────────────────
 const bingoStatus = document.getElementById('bingo-status');
 const rackDisplay = document.getElementById('rack-display');
-const bingoGuess = document.getElementById('bingo-guess');
+const answerBoxes = document.getElementById('answer-boxes');
 const bingoSubmit = document.getElementById('bingo-submit');
 const bingoNext = document.getElementById('bingo-next');
 const bingoReveal = document.getElementById('bingo-reveal');
 const bingoFeedback = document.getElementById('bingo-feedback');
 const bingoStat = document.getElementById('bingo-stat');
+const rangeLo = document.getElementById('range-lo');
+const rangeHi = document.getElementById('range-hi');
+const rangeGo = document.getElementById('range-go');
 
-let currentBand = 0;
-let currentWord = null;
+let currentEntry = null;
+let currentAnagrams = [];
 let score = { correct: 0, attempted: 0 };
 let revealed = false;
+let rangeLoBound = 1;
+let rangeHiBound = 1000;
 
-function scramble(word) {
-  return word.split('').sort().join('');
-}
-
-function showRack(letters) {
+function showRack(key) {
   rackDisplay.innerHTML = '';
-  for (const c of letters) {
+  for (const c of key) {
     const tile = document.createElement('div');
     tile.className = 'rack-tile';
     tile.textContent = c;
@@ -274,8 +279,46 @@ function showRack(letters) {
   }
 }
 
-function pickWord() {
-  const [lo, hi] = BANDS[currentBand];
+function buildAnswerBoxes(count) {
+  answerBoxes.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const row = document.createElement('div');
+    row.className = 'answer-row';
+    if (count > 1) {
+      const lbl = document.createElement('span');
+      lbl.className = 'answer-label';
+      lbl.textContent = `answer ${i + 1}:`;
+      row.appendChild(lbl);
+    }
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'answer-input';
+    inp.maxLength = 7;
+    inp.autocomplete = 'off';
+    inp.autocorrect = 'off';
+    inp.setAttribute('autocapitalize', 'characters');
+    inp.spellcheck = false;
+    inp.placeholder = 'unscramble it…';
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitGuess(); });
+    row.appendChild(inp);
+    answerBoxes.appendChild(row);
+  }
+}
+
+function getInputs() {
+  return [...answerBoxes.querySelectorAll('.answer-input')];
+}
+
+function lockInputs() {
+  getInputs().forEach(i => i.disabled = true);
+  bingoSubmit.disabled = true;
+  bingoReveal.disabled = true;
+  bingoNext.disabled = false;
+}
+
+function pickEntry() {
+  const lo = rangeLoBound - 1;
+  const hi = rangeHiBound;
   const pool = rankedBingos.slice(lo, Math.min(hi, rankedBingos.length));
   if (!pool.length) return null;
   return pool[Math.floor(Math.random() * pool.length)];
@@ -285,129 +328,111 @@ function newRound() {
   revealed = false;
   bingoFeedback.textContent = '';
   bingoFeedback.className = 'bingo-feedback';
-  bingoGuess.value = '';
-  bingoGuess.className = '';
-  bingoGuess.disabled = false;
-  bingoSubmit.disabled = false;
-  bingoReveal.disabled = false;
   bingoNext.disabled = true;
+  bingoReveal.disabled = false;
+  bingoSubmit.disabled = false;
 
-  const entry = pickWord();
-  if (!entry) { bingoStatus.textContent = 'no words in this band'; return; }
-  currentWord = entry;
-  const scrambled = scramble(entry.word);
-  showRack(scrambled);
-  bingoStatus.textContent = `rank #${entry.rank} · prob ${(entry.prob * 100).toFixed(4)}%`;
-  bingoGuess.focus();
+  const entry = pickEntry();
+  if (!entry) { bingoStatus.textContent = 'no words in this range'; return; }
+  currentEntry = entry;
+  currentAnagrams = (anagramMap.get(entry.key) || []).slice().sort();
+
+  showRack(entry.key);
+  buildAnswerBoxes(currentAnagrams.length);
+  getInputs()[0].focus();
+
+  const plural = currentAnagrams.length > 1 ? `${currentAnagrams.length} possible answers` : '1 answer';
+  bingoStatus.textContent = `rank #${entry.rank} · prob ${(entry.prob * 100).toFixed(4)}% · ${plural}`;
   updateStat();
 }
 
 function updateStat() {
   if (score.attempted === 0) { bingoStat.textContent = ''; return; }
-  bingoStat.textContent = `score: ${score.correct}/${score.attempted} (${Math.round(score.correct/score.attempted*100)}%)`;
+  bingoStat.textContent = `score: ${score.correct}/${score.attempted} (${Math.round(score.correct / score.attempted * 100)}%)`;
 }
 
 function submitGuess() {
-  if (!currentWord || revealed) return;
-  const guess = bingoGuess.value.trim().toUpperCase();
-  if (guess.length !== 7) return;
+  if (!currentEntry || revealed) return;
+  const inputs = getInputs();
+  const guesses = inputs.map(i => i.value.trim().toUpperCase());
+  if (guesses.every(g => g.length === 0)) return;
 
-  score.attempted++;
-  if (guess === currentWord.word) {
-    score.correct++;
-    bingoGuess.className = 'correct';
-    bingoFeedback.textContent = '✓ correct!';
-    bingoFeedback.className = 'bingo-feedback correct';
-    bingoSubmit.disabled = true;
-    bingoGuess.disabled = true;
-    bingoReveal.disabled = true;
-    bingoNext.disabled = false;
-  } else {
-    const sortedGuess = guess.split('').sort().join('');
-    const sortedTarget = currentWord.word.split('').sort().join('');
-    if (sortedGuess === sortedTarget && wordSet.has(guess)) {
-      score.correct++;
-      bingoGuess.className = 'correct';
-      bingoFeedback.textContent = `✓ also valid! (target was ${currentWord.word})`;
-      bingoFeedback.className = 'bingo-feedback correct';
-      bingoSubmit.disabled = true;
-      bingoGuess.disabled = true;
-      bingoReveal.disabled = true;
-      bingoNext.disabled = false;
-    } else {
-      bingoGuess.className = 'wrong';
-      bingoFeedback.textContent = '✗ nope, try again';
-      bingoFeedback.className = 'bingo-feedback wrong';
-      setTimeout(() => { bingoGuess.className = ''; }, 400);
-      score.attempted--;
+  const sortedKey = currentEntry.key;
+  let gotOne = false;
+  for (const guess of guesses) {
+    if (guess.length !== 7) continue;
+    if (guess.split('').sort().join('') === sortedKey && wordSet.has(guess)) {
+      gotOne = true;
+      break;
     }
+  }
+
+  if (gotOne) {
+    score.correct++;
+    score.attempted++;
+    inputs.forEach(i => i.classList.add('correct'));
+    bingoFeedback.textContent = `✓ correct! all answers: ${currentAnagrams.join(', ')}`;
+    bingoFeedback.className = 'bingo-feedback correct';
+    lockInputs();
+  } else {
+    inputs.forEach(i => {
+      if (i.value.trim()) { i.classList.add('wrong'); setTimeout(() => i.classList.remove('wrong'), 400); }
+    });
+    bingoFeedback.textContent = '✗ nope, try again';
+    bingoFeedback.className = 'bingo-feedback wrong';
   }
   updateStat();
 }
 
 bingoSubmit.addEventListener('click', submitGuess);
-bingoGuess.addEventListener('keydown', e => { if (e.key === 'Enter') submitGuess(); });
 bingoNext.addEventListener('click', newRound);
 
 bingoReveal.addEventListener('click', () => {
-  if (!currentWord || revealed) return;
+  if (!currentEntry || revealed) return;
   revealed = true;
   score.attempted++;
-  bingoFeedback.textContent = `answer: ${currentWord.word}`;
-  bingoFeedback.className = 'bingo-feedback wrong';
-  bingoGuess.disabled = true;
-  bingoSubmit.disabled = true;
-  bingoReveal.disabled = true;
-  bingoNext.disabled = false;
+  bingoFeedback.textContent = `answers: ${currentAnagrams.join(', ')}`;
+  bingoFeedback.className = 'bingo-feedback info';
+  lockInputs();
   updateStat();
 });
 
-document.querySelectorAll('.band-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.band-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentBand = +btn.dataset.band;
-    if (rankedBingos) newRound();
-  });
+rangeGo.addEventListener('click', () => {
+  const lo = parseInt(rangeLo.value) || 1;
+  const hi = parseInt(rangeHi.value) || 1000;
+  rangeLoBound = Math.max(1, lo);
+  rangeHiBound = Math.max(rangeLoBound, hi);
+  if (rankedBingos) newRound();
 });
+
+// also trigger on enter in range inputs
+[rangeLo, rangeHi].forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') rangeGo.click(); }));
 
 // ── Mode switcher ─────────────────────────────────────────────────────────────
 const searchPanel = document.getElementById('search-panel');
 const bingoPanel = document.getElementById('bingo-panel');
 const btnSearch = document.getElementById('btn-search');
 const btnBingo = document.getElementById('btn-bingo');
-
 let bingoReady = false;
 
 btnSearch.addEventListener('click', () => {
-  btnSearch.classList.add('active');
-  btnBingo.classList.remove('active');
-  searchPanel.classList.remove('hidden');
-  bingoPanel.classList.remove('visible');
+  btnSearch.classList.add('active'); btnBingo.classList.remove('active');
+  searchPanel.classList.remove('hidden'); bingoPanel.classList.remove('visible');
 });
 
 btnBingo.addEventListener('click', async () => {
-  btnBingo.classList.add('active');
-  btnSearch.classList.remove('active');
-  searchPanel.classList.add('hidden');
-  bingoPanel.classList.add('visible');
-
+  btnBingo.classList.add('active'); btnSearch.classList.remove('active');
+  searchPanel.classList.add('hidden'); bingoPanel.classList.add('visible');
   if (!bingoReady) {
     bingoStatus.textContent = wordSet ? 'computing probabilities…' : 'loading word list…';
-    rackDisplay.innerHTML = '';
-    bingoGuess.disabled = true;
-    bingoSubmit.disabled = true;
-    bingoNext.disabled = true;
-    bingoReveal.disabled = true;
-
+    rackDisplay.innerHTML = ''; answerBoxes.innerHTML = '';
+    bingoSubmit.disabled = true; bingoNext.disabled = true; bingoReveal.disabled = true;
     try {
       if (!wordSet) await loadWordList();
       buildBingoList();
       bingoReady = true;
       newRound();
-    } catch(e) {
-      bingoStatus.textContent = 'could not load CSW24.txt';
-    }
+    } catch(e) { bingoStatus.textContent = 'could not load CSW24.txt'; }
   }
 });
 
@@ -418,9 +443,7 @@ btnBingo.addEventListener('click', async () => {
     statusEl.textContent = '';
     goBtn.disabled = false;
     queryEl.focus();
-  } catch(e) {
-    statusEl.textContent = 'could not load CSW24.txt';
-  }
+  } catch(e) { statusEl.textContent = 'could not load CSW24.txt'; }
 })();
 </script>
 </body>
