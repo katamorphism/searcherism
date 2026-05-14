@@ -411,89 +411,49 @@ len7btn.addEventListener('click', () => { currentLen = 7; len7btn.classList.add(
 len8btn.addEventListener('click', () => { currentLen = 8; len8btn.classList.add('active'); len7btn.classList.remove('active'); if (bingoCache[8]) newRound(); });
 
 // ── 2LW MINIMAL MODE ─────────────────────────────────────────────────────────
-let learned2lw = new Set();
-let current2lwWord = null;
-
-function load2lwProgress() {
-  const stored = localStorage.getItem('searcherism_2lw');
-  if (stored) learned2lw = new Set(JSON.parse(stored));
-}
-
-function save2lwProgress() {
-  localStorage.setItem('searcherism_2lw', JSON.stringify([...learned2lw]));
-}
+// ── 2LW MINIMAL MODE ─────────────────────────────────────────────────────────
+let entered2lw = new Set();
 
 function update2lwProgress() {
   const total = twolwList.length;
-  const learned = learned2lw.size;
-  const pct = total === 0 ? 0 : (learned / total * 100);
+  const done = entered2lw.size;
+  const pct = total === 0 ? 0 : (done / total * 100);
   document.getElementById('twolw-progress-fill').style.width = `${pct}%`;
-  document.getElementById('twolw-count').textContent = `${learned} / ${total} learned`;
-}
-
-function pickRandom2lw() {
-  const unlearned = twolwList.filter(w => !learned2lw.has(w));
-  if (unlearned.length === 0) {
-    document.getElementById('twolw-display').textContent = '🎉';
-    document.getElementById('twolw-feedback').innerHTML = 'You know all 2-letter words! Reset?';
-    document.getElementById('twolw-input').disabled = true;
-    return null;
-  }
-  return unlearned[Math.floor(Math.random() * unlearned.length)];
-}
-
-function display2lwWord() {
-  const word = pickRandom2lw();
-  if (!word) return null;
-  current2lwWord = word;
-  document.getElementById('twolw-display').textContent = '??';
-  document.getElementById('twolw-input').value = '';
-  document.getElementById('twolw-input').disabled = false;
-  document.getElementById('twolw-input').classList.remove('correct', 'wrong');
-  document.getElementById('twolw-feedback').innerHTML = '';
-  document.getElementById('twolw-input').focus();
-  return word;
+  document.getElementById('twolw-count').textContent = `${done} / ${total} found`;
 }
 
 function check2lwAnswer() {
-  if (!current2lwWord) return;
-  const guess = document.getElementById('twolw-input').value.trim().toUpperCase();
-  if (guess === current2lwWord) {
-    learned2lw.add(current2lwWord);
-    save2lwProgress();
-    update2lwProgress();
-    document.getElementById('twolw-input').classList.add('correct');
-    document.getElementById('twolw-feedback').innerHTML = '✓ correct!';
-    setTimeout(() => {
-      display2lwWord();
-    }, 500);
-  } else if (guess.length === 2) {
-    document.getElementById('twolw-input').classList.add('wrong');
-    document.getElementById('twolw-feedback').innerHTML = `✗ "${guess}" is not correct. Try again!`;
-    setTimeout(() => document.getElementById('twolw-input').classList.remove('wrong'), 500);
-    document.getElementById('twolw-input').value = '';
-    document.getElementById('twolw-input').focus();
-  }
-}
+  const input = document.getElementById('twolw-input');
+  const feedback = document.getElementById('twolw-feedback');
+  const guess = input.value.trim().toUpperCase();
+  if (guess.length !== 2) return;
 
-function next2lw() {
-  if (current2lwWord && !learned2lw.has(current2lwWord)) {
-    // skip current word without marking learned
-    document.getElementById('twolw-feedback').innerHTML = `skipped: ${current2lwWord}`;
-    setTimeout(() => {
-      display2lwWord();
-    }, 600);
+  if (entered2lw.has(guess)) {
+    input.classList.add('wrong');
+    feedback.innerHTML = `already got ${guess}`;
+    setTimeout(() => { input.classList.remove('wrong'); input.value = ''; input.focus(); }, 600);
+    return;
+  }
+
+  if (wordSet.has(guess)) {
+    entered2lw.add(guess);
+    update2lwProgress();
+    input.classList.add('correct');
+    feedback.innerHTML = `✓ ${guess}`;
+    setTimeout(() => { input.classList.remove('correct'); input.value = ''; input.focus(); }, 400);
   } else {
-    display2lwWord();
+    input.classList.add('wrong');
+    feedback.innerHTML = `✗ ${guess} is not a valid CSW24 word`;
+    setTimeout(() => { input.classList.remove('wrong'); input.value = ''; input.focus(); }, 600);
   }
 }
 
 function reset2lw() {
-  learned2lw.clear();
-  save2lwProgress();
+  entered2lw.clear();
   update2lwProgress();
-  display2lwWord();
-  document.getElementById('twolw-feedback').innerHTML = 'reset complete!';
+  document.getElementById('twolw-input').value = '';
+  document.getElementById('twolw-feedback').innerHTML = 'reset!';
+  document.getElementById('twolw-input').focus();
 }
 
 // ── Mode switcher ─────────────────────────────────────────────────────────────
@@ -532,17 +492,10 @@ btn2lw.addEventListener('click', async () => {
   searchPanel.classList.add('hidden'); bingoPanel.classList.remove('visible'); twolwPanel.classList.add('visible');
   try {
     if (!wordSet) await loadWordList();
-    load2lwProgress();
     update2lwProgress();
-    display2lwWord();
-    
     const input = document.getElementById('twolw-input');
-    const nextBtn = document.getElementById('twolw-next');
-    
     input.onkeydown = (e) => { if (e.key === 'Enter') check2lwAnswer(); };
-    nextBtn.onclick = next2lw;
-    
-    // add reset button
+    input.focus();
     if (!document.getElementById('twolw-reset')) {
       const resetBtn = document.createElement('button');
       resetBtn.id = 'twolw-reset';
