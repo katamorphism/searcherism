@@ -9,11 +9,9 @@
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: 'Comfortaa', sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; position: relative; }
 
-    /* mode switcher - left side */
-    .mode-switcher { position: fixed; top: 24px; left: 24px; display: flex; z-index: 100; }
-    .mode-btn { font-family: inherit; font-size: .75rem; padding: 4px 12px; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #888; letter-spacing: 1px; text-transform: uppercase; transition: all .15s; }
-    .mode-btn:first-child { border-radius: 6px 0 0 6px; }
-    .mode-btn:last-child { border-radius: 0 6px 6px 0; border-left: none; }
+    /* mode switcher */
+    .mode-switcher { position: fixed; top: 24px; left: 24px; display: flex; z-index: 100; flex-wrap: wrap; gap: 4px; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .mode-btn { font-family: inherit; font-size: .7rem; padding: 4px 10px; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #888; letter-spacing: 1px; text-transform: uppercase; transition: all .15s; border-radius: 4px; }
     .mode-btn.active { background: #222; color: #fff; border-color: #222; }
 
     h1 { font-size: 2rem; margin: 28px 0 4px; text-align: center; }
@@ -22,55 +20,48 @@
     /* search mode */
     .input-row { display: flex; gap: 8px; }
     input[type=text] { font-family: inherit; font-size: 1.2rem; padding: 8px; flex: 1; text-transform: uppercase; }
-    button.action { font-family: inherit; font-size: 1rem; padding: 8px 16px; cursor: pointer; border: 1px solid #ccc; background: #fff; }
+    button.action { font-family: inherit; font-size: 1rem; padding: 8px 16px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 6px; }
     button.action:hover:not(:disabled) { background: #f5f5f5; }
     button:disabled { opacity: .4; cursor: default; }
     .hint { font-size: .8rem; color: #888; margin: 6px 0 0; }
     #status { color: #888; margin: 16px 0; }
     .length-heading { font-size: .75rem; letter-spacing: 2px; text-transform: uppercase; color: #888; margin: 20px 0 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
     .tile-row { display: flex; flex-wrap: wrap; gap: 6px; }
-    .word-tile { border: 1px solid #ccc; padding: 4px 10px; font-size: .95rem; }
+    .word-tile { border: 1px solid #ccc; padding: 4px 10px; font-size: .95rem; border-radius: 4px; }
 
-    /* bingo mode */
-    #bingo-panel { display: none; }
-    #bingo-panel.visible { display: block; }
+    /* bingo & 2lw modes */
+    #bingo-panel, #twolw-panel { display: none; }
+    #bingo-panel.visible, #twolw-panel.visible { display: block; }
     #search-panel.hidden { display: none; }
 
-    .len-row { display: flex; gap: 0; margin-bottom: 16px; align-items: center; justify-content: center; }
-    .len-row .range-label { font-size: .8rem; color: #888; margin-right: 10px; }
-    .len-btn { font-family: inherit; font-size: .8rem; padding: 4px 14px; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #888; transition: all .15s; }
-    .len-btn:first-of-type { border-radius: 6px 0 0 6px; }
-    .len-btn:last-of-type { border-radius: 0 6px 6px 0; border-left: none; }
-    .len-btn.active { background: #222; color: #fff; border-color: #222; }
+    .stat-row { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-radius: 12px; }
+    .stat-item { text-align: center; }
+    .stat-label { font-size: .7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { font-size: 1.4rem; font-weight: 700; color: #222; }
 
-    .range-row { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; justify-content: center; flex-wrap: wrap; }
-    .range-label { font-size: .8rem; color: #888; }
-    .range-row input[type=number] { font-family: inherit; font-size: .85rem; padding: 4px 6px; width: 80px; border: 1px solid #ccc; }
-    .range-row .sep { font-size: .85rem; color: #aaa; }
-    .range-row button.action { font-size: .8rem; padding: 5px 14px; }
+    .progress-bar { background: #eee; border-radius: 20px; height: 8px; margin: 16px 0; overflow: hidden; }
+    .progress-fill { background: #22c55e; height: 100%; width: 0%; transition: width .3s; border-radius: 20px; }
 
-    .rack-display { display: flex; gap: 8px; justify-content: center; margin: 28px 0 20px; flex-wrap: wrap; }
-    .rack-tile { width: 52px; height: 52px; border: 2px solid #222; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; border-radius: 4px; background: #fafafa; transition: transform .2s; }
-    .rack-tile:hover { transform: translateY(-3px); }
+    .twolw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin: 20px 0; }
+    .twolw-card { border: 1px solid #ddd; border-radius: 8px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all .15s; background: #fff; }
+    .twolw-card:hover:not(.learned) { border-color: #aaa; transform: translateY(-2px); }
+    .twolw-card.learned { background: #f0fdf4; border-color: #22c55e; color: #16a34a; cursor: default; opacity: 0.7; }
+    .twolw-card.learned::after { content: " ✓"; font-size: .8rem; }
+    .twolw-card.selected { background: #e0e7ff; border-color: #3b82f6; transform: scale(1.02); }
+    .twolw-word { font-family: monospace; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; }
+    .twolw-def { font-size: .65rem; color: #888; margin-top: 4px; }
 
-    .answer-boxes { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-    .answer-row { display: flex; gap: 8px; align-items: center; }
-    .answer-label { font-size: .75rem; color: #aaa; min-width: 72px; }
-    .answer-input { font-family: inherit; font-size: 1.1rem; padding: 7px 8px; flex: 1; text-transform: uppercase; border: 1px solid #ccc; }
-    .answer-input.correct { border-color: #22c55e; background: #f0fdf4; }
-    .answer-input.wrong { border-color: #ef4444; background: #fef2f2; animation: shake .3s; }
+    .quiz-panel { background: #fafafa; border-radius: 16px; padding: 20px; margin: 20px 0; text-align: center; }
+    .quiz-prompt { font-size: 1.2rem; margin-bottom: 16px; }
+    .quiz-input { font-family: inherit; font-size: 1.5rem; padding: 12px; width: 150px; text-align: center; text-transform: uppercase; border: 2px solid #ccc; border-radius: 12px; letter-spacing: 2px; }
+    .quiz-input.correct { border-color: #22c55e; background: #f0fdf4; }
+    .quiz-input.wrong { border-color: #ef4444; background: #fef2f2; animation: shake .3s; }
+    .quiz-feedback { margin-top: 12px; font-size: .9rem; min-height: 3em; }
+    .quiz-hint { font-size: .75rem; color: #888; margin-top: 8px; }
+
+    .action-group { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-
-    .bingo-feedback { font-size: .95rem; min-height: 1.4em; margin-bottom: 12px; text-align: center; }
-    .bingo-feedback.correct { color: #16a34a; }
-    .bingo-feedback.wrong { color: #dc2626; }
-    .bingo-feedback.info { color: #888; }
-
-    .bingo-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-    .bingo-stat { font-size: .8rem; color: #888; margin-top: 16px; text-align: center; }
-    #bingo-status { color: #888; margin: 10px 0; font-size: .9rem; text-align: center; }
-    .reveal-word { font-family: inherit; font-size: .8rem; padding: 4px 10px; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #888; border-radius: 4px; }
-    .reveal-word:hover { border-color: #999; color: #333; }
   </style>
 </head>
 <body>
@@ -78,6 +69,7 @@
   <div class="mode-switcher">
     <button class="mode-btn active" id="btn-search">search</button>
     <button class="mode-btn" id="btn-bingo">bingo</button>
+    <button class="mode-btn" id="btn-2lw">2lw</button>
   </div>
 
   <h1>searcherism</h1>
@@ -101,38 +93,60 @@
   <div id="bingo-panel">
     <p class="subtitle">bingo trainer · CSW24</p>
 
-    <div class="len-row">
-      <span class="range-label">letters:</span>
-      <button class="len-btn active" id="len-7">7</button>
-      <button class="len-btn" id="len-8">8</button>
+    <div class="len-row" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
+      <button class="len-btn active" id="len-7" style="padding: 4px 14px; border: 1px solid #ccc; background: #fff; border-radius: 6px;">7</button>
+      <button class="len-btn" id="len-8" style="padding: 4px 14px; border: 1px solid #ccc; background: #fff; border-radius: 6px;">8</button>
     </div>
 
-    <div class="range-row">
-      <span class="range-label">rank range:</span>
-      <input type="number" id="range-lo" value="1" min="1" />
-      <span class="sep">–</span>
-      <input type="number" id="range-hi" value="1000" min="1" />
-      <button class="action" id="range-go">go</button>
+    <div class="range-row" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;">
+      <input type="number" id="range-lo" value="1" min="1" style="width: 70px;" />
+      <span>–</span>
+      <input type="number" id="range-hi" value="1000" min="1" style="width: 70px;" />
+      <button class="action" id="range-go" style="padding: 4px 12px;">go</button>
     </div>
 
     <div id="bingo-status">loading word list…</div>
-    <div class="rack-display" id="rack-display"></div>
+    <div class="rack-display" id="rack-display" style="display: flex; gap: 8px; justify-content: center; margin: 20px 0; flex-wrap: wrap;"></div>
     <div class="answer-boxes" id="answer-boxes"></div>
     <div class="bingo-feedback" id="bingo-feedback"></div>
-    <div class="bingo-actions">
+    <div class="action-group">
       <button class="action" id="bingo-submit" disabled>guess</button>
       <button class="action" id="bingo-next" disabled>next word</button>
       <button class="reveal-word" id="bingo-reveal" disabled>reveal</button>
     </div>
-    <div class="bingo-stat" id="bingo-stat"></div>
+    <div class="bingo-stat" id="bingo-stat" style="text-align: center; margin-top: 16px;"></div>
+  </div>
+
+  <!-- 2LW RECITATION MODE -->
+  <div id="twolw-panel">
+    <p class="subtitle">2-letter word recitation · CSW24</p>
+
+    <div class="stat-row">
+      <div class="stat-item"><div class="stat-label">learned</div><div class="stat-value" id="learned-count">0</div></div>
+      <div class="stat-item"><div class="stat-label">total</div><div class="stat-value" id="total-count">0</div></div>
+      <div class="stat-item"><div class="stat-label">mastery</div><div class="stat-value" id="mastery-pct">0%</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="quiz-panel">
+      <div class="quiz-prompt">🔤 type the 2-letter word for:</div>
+      <div style="font-size: 2rem; font-weight: 700; margin: 12px 0;" id="quiz-definition">---</div>
+      <input type="text" id="quiz-input" class="quiz-input" maxlength="2" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="??" />
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <div class="quiz-hint" id="quiz-hint">click a word below to mark as learned / test yourself</div>
+      <div class="action-group">
+        <button class="action" id="quiz-submit">check</button>
+        <button class="action" id="quiz-skip">skip / reveal</button>
+        <button class="action" id="quiz-reset">reset all</button>
+      </div>
+    </div>
+
+    <div id="twolw-grid" class="twolw-grid"></div>
   </div>
 
 <script>
 // ── Scrabble bag ─────────────────────────────────────────────────────────────
-const BAG = {
-  A:9,B:2,C:2,D:4,E:12,F:2,G:3,H:2,I:9,J:1,K:1,L:4,M:2,
-  N:6,O:8,P:2,Q:1,R:6,S:4,T:6,U:4,V:2,W:2,X:1,Y:2,Z:1
-};
+const BAG = { A:9,B:2,C:2,D:4,E:12,F:2,G:3,H:2,I:9,J:1,K:1,L:4,M:2,N:6,O:8,P:2,Q:1,R:6,S:4,T:6,U:4,V:2,W:2,X:1,Y:2,Z:1 };
 const TOTAL = 100;
 
 function comb(n, k) {
@@ -158,13 +172,17 @@ function wordProbability(word, denom) {
 // ── Word list ─────────────────────────────────────────────────────────────────
 const WORD_LIST_URL = "https://raw.githubusercontent.com/katamorphism/searcherism/refs/heads/main/CSW24.txt";
 let wordSet = null;
-let bingoCache = {}; // keyed by letter count: { ranked, anagramMap }
+let bingoCache = {};
+let twolwList = []; // { word, definition? placeholder }
 
 async function loadWordList() {
   const res = await fetch(WORD_LIST_URL);
   if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
   const text = await res.text();
   wordSet = new Set(text.split(/\r?\n/).map(w => w.trim().toUpperCase()).filter(Boolean));
+  
+  // extract 2-letter words
+  twolwList = [...wordSet].filter(w => w.length === 2).sort();
 }
 
 function buildBingoList(len) {
@@ -324,10 +342,7 @@ function buildAnswerBoxes(count) {
   }
 }
 
-function getInputs() {
-  return [...answerBoxes.querySelectorAll('.answer-input')];
-}
-
+function getInputs() { return [...answerBoxes.querySelectorAll('.answer-input')]; }
 function lockInputs() {
   getInputs().forEach(i => i.disabled = true);
   bingoSubmit.disabled = true;
@@ -352,19 +367,13 @@ function newRound() {
   bingoNext.disabled = true;
   bingoReveal.disabled = false;
   bingoSubmit.disabled = false;
-
   const entry = pickEntry();
-  if (!entry) { 
-    bingoStatus.textContent = 'no words in this range'; 
-    return; 
-  }
+  if (!entry) { bingoStatus.textContent = 'no words in this range'; return; }
   currentEntry = entry;
   currentAnagrams = (bingoCache[currentLen].anagramMap.get(entry.key) || []).slice().sort();
-
   showRack(entry.key);
   buildAnswerBoxes(currentAnagrams.length);
   getInputs()[0]?.focus();
-
   const plural = currentAnagrams.length > 1 ? `${currentAnagrams.length} possible answers` : '1 answer';
   bingoStatus.textContent = `rank #${entry.rank} · prob ${(entry.prob * 100).toFixed(4)}% · ${plural}`;
   updateStat();
@@ -380,7 +389,6 @@ function submitGuess() {
   const inputs = getInputs();
   const guesses = inputs.map(i => i.value.trim().toUpperCase());
   if (guesses.every(g => g.length === 0)) return;
-
   const sortedKey = currentEntry.key;
   let gotOne = false;
   for (const guess of guesses) {
@@ -390,7 +398,6 @@ function submitGuess() {
       break;
     }
   }
-
   if (gotOne) {
     score.correct++;
     score.attempted++;
@@ -399,9 +406,7 @@ function submitGuess() {
     bingoFeedback.className = 'bingo-feedback correct';
     lockInputs();
   } else {
-    inputs.forEach(i => {
-      if (i.value.trim()) { i.classList.add('wrong'); setTimeout(() => i.classList.remove('wrong'), 400); }
-    });
+    inputs.forEach(i => { if (i.value.trim()) { i.classList.add('wrong'); setTimeout(() => i.classList.remove('wrong'), 400); } });
     bingoFeedback.textContent = '✗ nope, try again';
     bingoFeedback.className = 'bingo-feedback wrong';
   }
@@ -410,7 +415,6 @@ function submitGuess() {
 
 bingoSubmit.addEventListener('click', submitGuess);
 bingoNext.addEventListener('click', newRound);
-
 bingoReveal.addEventListener('click', () => {
   if (!currentEntry || revealed) return;
   revealed = true;
@@ -420,7 +424,6 @@ bingoReveal.addEventListener('click', () => {
   lockInputs();
   updateStat();
 });
-
 rangeGo.addEventListener('click', () => {
   const lo = parseInt(rangeLo.value) || 1;
   const hi = parseInt(rangeHi.value) || 1000;
@@ -428,38 +431,145 @@ rangeGo.addEventListener('click', () => {
   rangeHiBound = Math.max(rangeLoBound, hi);
   if (bingoCache[currentLen]) newRound();
 });
-
 [rangeLo, rangeHi].forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') rangeGo.click(); }));
+len7btn.addEventListener('click', () => { currentLen = 7; len7btn.classList.add('active'); len8btn.classList.remove('active'); if (bingoCache[7]) newRound(); });
+len8btn.addEventListener('click', () => { currentLen = 8; len8btn.classList.add('active'); len7btn.classList.remove('active'); if (bingoCache[8]) newRound(); });
 
-len7btn.addEventListener('click', () => {
-  currentLen = 7;
-  len7btn.classList.add('active');
-  len8btn.classList.remove('active');
-  if (bingoCache[7]) newRound();
-});
+// ── 2LW RECITATION MODE ──────────────────────────────────────────────────────
+let learnedWords = new Set(); // store learned 2-letter words
+let currentQuizWord = null;
+let quizMode = 'testing'; // 'testing' or 'reciting'
 
-len8btn.addEventListener('click', () => {
-  currentLen = 8;
-  len8btn.classList.add('active');
-  len7btn.classList.remove('active');
-  if (bingoCache[8]) newRound();
-});
+function loadLearnedFromStorage() {
+  const stored = localStorage.getItem('searcherism_2lw_learned');
+  if (stored) learnedWords = new Set(JSON.parse(stored));
+}
+
+function saveLearnedToStorage() {
+  localStorage.setItem('searcherism_2lw_learned', JSON.stringify([...learnedWords]));
+}
+
+function updateProgress() {
+  const total = twolwList.length;
+  const learned = learnedWords.size;
+  document.getElementById('learned-count').textContent = learned;
+  document.getElementById('total-count').textContent = total;
+  const pct = total === 0 ? 0 : Math.round(learned / total * 100);
+  document.getElementById('mastery-pct').textContent = `${pct}%`;
+  document.getElementById('progress-fill').style.width = `${pct}%`;
+  
+  // update grid classes
+  document.querySelectorAll('.twolw-card').forEach(card => {
+    const word = card.dataset.word;
+    if (learnedWords.has(word)) card.classList.add('learned');
+    else card.classList.remove('learned');
+  });
+}
+
+function renderTwolwGrid() {
+  const grid = document.getElementById('twolw-grid');
+  grid.innerHTML = '';
+  for (const word of twolwList) {
+    const card = document.createElement('div');
+    card.className = 'twolw-card';
+    if (learnedWords.has(word)) card.classList.add('learned');
+    card.dataset.word = word;
+    card.innerHTML = `<div class="twolw-word">${word}</div><div class="twolw-def">click to mark</div>`;
+    card.addEventListener('click', () => {
+      if (learnedWords.has(word)) {
+        learnedWords.delete(word);
+      } else {
+        learnedWords.add(word);
+      }
+      saveLearnedToStorage();
+      updateProgress();
+      renderTwolwGrid();
+    });
+    grid.appendChild(card);
+  }
+}
+
+function pickRandomUnlearned() {
+  const unlearned = twolwList.filter(w => !learnedWords.has(w));
+  if (unlearned.length === 0) return null;
+  return unlearned[Math.floor(Math.random() * unlearned.length)];
+}
+
+function startQuiz() {
+  const nextWord = pickRandomUnlearned();
+  if (!nextWord) {
+    document.getElementById('quiz-definition').textContent = '🎉 ALL LEARNED! 🎉';
+    document.getElementById('quiz-input').disabled = true;
+    document.getElementById('quiz-submit').disabled = true;
+    document.getElementById('quiz-feedback').innerHTML = 'Congratulations! You know all 2-letter words!';
+    return;
+  }
+  currentQuizWord = nextWord;
+  // generate a simple definition/hint (just show the word scrambled or just "???")
+  const scrambled = nextWord.split('').sort().join('');
+  document.getElementById('quiz-definition').innerHTML = `"${nextWord}"<br><span style="font-size:0.8rem; color:#888;">${scrambled === nextWord ? 'same letters' : `scrambled: ${scrambled}`}</span>`;
+  document.getElementById('quiz-input').value = '';
+  document.getElementById('quiz-input').disabled = false;
+  document.getElementById('quiz-submit').disabled = false;
+  document.getElementById('quiz-input').classList.remove('correct', 'wrong');
+  document.getElementById('quiz-feedback').innerHTML = '';
+}
+
+function checkQuizAnswer() {
+  if (!currentQuizWord) return;
+  const guess = document.getElementById('quiz-input').value.trim().toUpperCase();
+  if (guess === currentQuizWord) {
+    // correct!
+    learnedWords.add(currentQuizWord);
+    saveLearnedToStorage();
+    updateProgress();
+    renderTwolwGrid();
+    document.getElementById('quiz-input').classList.add('correct');
+    document.getElementById('quiz-feedback').innerHTML = '✓ Correct! Learned!';
+    setTimeout(() => {
+      startQuiz();
+    }, 800);
+  } else {
+    document.getElementById('quiz-input').classList.add('wrong');
+    document.getElementById('quiz-feedback').innerHTML = `✗ Incorrect. The word is "${currentQuizWord}". Click next to continue.`;
+    setTimeout(() => document.getElementById('quiz-input').classList.remove('wrong'), 500);
+  }
+}
+
+function skipReveal() {
+  if (!currentQuizWord) return;
+  document.getElementById('quiz-feedback').innerHTML = `The word is "${currentQuizWord}".`;
+  document.getElementById('quiz-input').classList.add('wrong');
+  startQuiz();
+}
+
+function resetAll() {
+  learnedWords.clear();
+  saveLearnedToStorage();
+  updateProgress();
+  renderTwolwGrid();
+  startQuiz();
+  document.getElementById('quiz-feedback').innerHTML = 'Reset complete! Start learning!';
+}
 
 // ── Mode switcher ─────────────────────────────────────────────────────────────
 const searchPanel = document.getElementById('search-panel');
 const bingoPanel = document.getElementById('bingo-panel');
+const twolwPanel = document.getElementById('twolw-panel');
 const btnSearch = document.getElementById('btn-search');
 const btnBingo = document.getElementById('btn-bingo');
+const btn2lw = document.getElementById('btn-2lw');
 let bingoReady = false;
+let twolwReady = false;
 
 btnSearch.addEventListener('click', () => {
-  btnSearch.classList.add('active'); btnBingo.classList.remove('active');
-  searchPanel.classList.remove('hidden'); bingoPanel.classList.remove('visible');
+  btnSearch.classList.add('active'); btnBingo.classList.remove('active'); btn2lw.classList.remove('active');
+  searchPanel.classList.remove('hidden'); bingoPanel.classList.remove('visible'); twolwPanel.classList.remove('visible');
 });
 
 btnBingo.addEventListener('click', async () => {
-  btnBingo.classList.add('active'); btnSearch.classList.remove('active');
-  searchPanel.classList.add('hidden'); bingoPanel.classList.add('visible');
+  btnBingo.classList.add('active'); btnSearch.classList.remove('active'); btn2lw.classList.remove('active');
+  searchPanel.classList.add('hidden'); bingoPanel.classList.add('visible'); twolwPanel.classList.remove('visible');
   if (!bingoReady) {
     bingoStatus.textContent = wordSet ? 'computing probabilities…' : 'loading word list…';
     rackDisplay.innerHTML = ''; answerBoxes.innerHTML = '';
@@ -474,10 +584,29 @@ btnBingo.addEventListener('click', async () => {
   }
 });
 
+btn2lw.addEventListener('click', async () => {
+  btn2lw.classList.add('active'); btnSearch.classList.remove('active'); btnBingo.classList.remove('active');
+  searchPanel.classList.add('hidden'); bingoPanel.classList.remove('visible'); twolwPanel.classList.add('visible');
+  if (!twolwReady) {
+    try {
+      if (!wordSet) await loadWordList();
+      loadLearnedFromStorage();
+      renderTwolwGrid();
+      updateProgress();
+      startQuiz();
+      twolwReady = true;
+    } catch(e) { document.getElementById('twolw-panel').innerHTML = '<p>could not load CSW24.txt</p>'; }
+  }
+  document.getElementById('quiz-submit').onclick = checkQuizAnswer;
+  document.getElementById('quiz-skip').onclick = skipReveal;
+  document.getElementById('quiz-reset').onclick = resetAll;
+  document.getElementById('quiz-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkQuizAnswer(); });
+});
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async () => {
   try {
-    if (!wordSet) await loadWordList();
+    await loadWordList();
     statusEl.textContent = '';
     goBtn.disabled = false;
     queryEl.focus();
