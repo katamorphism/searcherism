@@ -10,7 +10,7 @@
     body { font-family: 'Comfortaa', sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; position: relative; }
 
     /* mode switcher */
-    .mode-switcher { position: fixed; top: 24px; left: 24px; display: flex; z-index: 100; flex-wrap: wrap; gap: 4px; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .mode-switcher { position: fixed; top: 24px; left: 24px; display: flex; z-index: 100; gap: 4px; background: white; border-radius: 8px; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .mode-btn { font-family: inherit; font-size: .7rem; padding: 4px 10px; cursor: pointer; border: 1px solid #ccc; background: #fff; color: #888; letter-spacing: 1px; text-transform: uppercase; transition: all .15s; border-radius: 4px; }
     .mode-btn.active { background: #222; color: #fff; border-color: #222; }
 
@@ -34,32 +34,21 @@
     #bingo-panel.visible, #twolw-panel.visible { display: block; }
     #search-panel.hidden { display: none; }
 
-    .stat-row { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding: 12px; background: #f9f9f9; border-radius: 12px; }
-    .stat-item { text-align: center; }
-    .stat-label { font-size: .7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-    .stat-value { font-size: 1.4rem; font-weight: 700; color: #222; }
+    /* 2LW minimal mode */
+    .twolw-stats { text-align: center; margin-bottom: 20px; }
+    .twolw-progress-bar { background: #eee; border-radius: 20px; height: 12px; margin: 12px 0; overflow: hidden; }
+    .twolw-progress-fill { background: #22c55e; height: 100%; width: 0%; transition: width .3s; border-radius: 20px; }
+    .twolw-count { font-size: .8rem; color: #666; margin-top: 8px; }
 
-    .progress-bar { background: #eee; border-radius: 20px; height: 8px; margin: 16px 0; overflow: hidden; }
-    .progress-fill { background: #22c55e; height: 100%; width: 0%; transition: width .3s; border-radius: 20px; }
-
-    .twolw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin: 20px 0; }
-    .twolw-card { border: 1px solid #ddd; border-radius: 8px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all .15s; background: #fff; }
-    .twolw-card:hover:not(.learned) { border-color: #aaa; transform: translateY(-2px); }
-    .twolw-card.learned { background: #f0fdf4; border-color: #22c55e; color: #16a34a; cursor: default; opacity: 0.7; }
-    .twolw-card.learned::after { content: " ✓"; font-size: .8rem; }
-    .twolw-card.selected { background: #e0e7ff; border-color: #3b82f6; transform: scale(1.02); }
-    .twolw-word { font-family: monospace; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; }
-    .twolw-def { font-size: .65rem; color: #888; margin-top: 4px; }
-
-    .quiz-panel { background: #fafafa; border-radius: 16px; padding: 20px; margin: 20px 0; text-align: center; }
-    .quiz-prompt { font-size: 1.2rem; margin-bottom: 16px; }
-    .quiz-input { font-family: inherit; font-size: 1.5rem; padding: 12px; width: 150px; text-align: center; text-transform: uppercase; border: 2px solid #ccc; border-radius: 12px; letter-spacing: 2px; }
-    .quiz-input.correct { border-color: #22c55e; background: #f0fdf4; }
-    .quiz-input.wrong { border-color: #ef4444; background: #fef2f2; animation: shake .3s; }
-    .quiz-feedback { margin-top: 12px; font-size: .9rem; min-height: 3em; }
-    .quiz-hint { font-size: .75rem; color: #888; margin-top: 8px; }
-
-    .action-group { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .twolw-quiz { text-align: center; padding: 30px 20px; background: #fafafa; border-radius: 24px; margin: 20px 0; }
+    .twolw-prompt { font-size: .9rem; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+    .twolw-word-display { font-size: 3rem; font-weight: 700; font-family: monospace; letter-spacing: 8px; margin: 20px 0; color: #222; }
+    .twolw-input { font-family: monospace; font-size: 2rem; padding: 16px; width: 160px; text-align: center; text-transform: uppercase; border: 2px solid #ccc; border-radius: 16px; letter-spacing: 4px; font-weight: 700; }
+    .twolw-input:focus { outline: none; border-color: #888; }
+    .twolw-input.correct { border-color: #22c55e; background: #f0fdf4; }
+    .twolw-input.wrong { border-color: #ef4444; background: #fef2f2; animation: shake .3s; }
+    .twolw-feedback { margin-top: 16px; font-size: .9rem; min-height: 3em; }
+    .twolw-next { margin-top: 20px; padding: 10px 24px; font-size: 1rem; }
 
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
   </style>
@@ -93,12 +82,12 @@
   <div id="bingo-panel">
     <p class="subtitle">bingo trainer · CSW24</p>
 
-    <div class="len-row" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
+    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;">
       <button class="len-btn active" id="len-7" style="padding: 4px 14px; border: 1px solid #ccc; background: #fff; border-radius: 6px;">7</button>
       <button class="len-btn" id="len-8" style="padding: 4px 14px; border: 1px solid #ccc; background: #fff; border-radius: 6px;">8</button>
     </div>
 
-    <div class="range-row" style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;">
+    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;">
       <input type="number" id="range-lo" value="1" min="1" style="width: 70px;" />
       <span>–</span>
       <input type="number" id="range-hi" value="1000" min="1" style="width: 70px;" />
@@ -109,7 +98,7 @@
     <div class="rack-display" id="rack-display" style="display: flex; gap: 8px; justify-content: center; margin: 20px 0; flex-wrap: wrap;"></div>
     <div class="answer-boxes" id="answer-boxes"></div>
     <div class="bingo-feedback" id="bingo-feedback"></div>
-    <div class="action-group">
+    <div style="display: flex; gap: 8px; justify-content: center;">
       <button class="action" id="bingo-submit" disabled>guess</button>
       <button class="action" id="bingo-next" disabled>next word</button>
       <button class="reveal-word" id="bingo-reveal" disabled>reveal</button>
@@ -117,31 +106,24 @@
     <div class="bingo-stat" id="bingo-stat" style="text-align: center; margin-top: 16px;"></div>
   </div>
 
-  <!-- 2LW RECITATION MODE -->
+  <!-- 2LW MINIMAL MODE -->
   <div id="twolw-panel">
     <p class="subtitle">2-letter word recitation · CSW24</p>
 
-    <div class="stat-row">
-      <div class="stat-item"><div class="stat-label">learned</div><div class="stat-value" id="learned-count">0</div></div>
-      <div class="stat-item"><div class="stat-label">total</div><div class="stat-value" id="total-count">0</div></div>
-      <div class="stat-item"><div class="stat-label">mastery</div><div class="stat-value" id="mastery-pct">0%</div></div>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-
-    <div class="quiz-panel">
-      <div class="quiz-prompt">🔤 type the 2-letter word for:</div>
-      <div style="font-size: 2rem; font-weight: 700; margin: 12px 0;" id="quiz-definition">---</div>
-      <input type="text" id="quiz-input" class="quiz-input" maxlength="2" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="??" />
-      <div class="quiz-feedback" id="quiz-feedback"></div>
-      <div class="quiz-hint" id="quiz-hint">click a word below to mark as learned / test yourself</div>
-      <div class="action-group">
-        <button class="action" id="quiz-submit">check</button>
-        <button class="action" id="quiz-skip">skip / reveal</button>
-        <button class="action" id="quiz-reset">reset all</button>
+    <div class="twolw-stats">
+      <div class="twolw-progress-bar">
+        <div class="twolw-progress-fill" id="twolw-progress-fill"></div>
       </div>
+      <div class="twolw-count" id="twolw-count">0 / 0 learned</div>
     </div>
 
-    <div id="twolw-grid" class="twolw-grid"></div>
+    <div class="twolw-quiz">
+      <div class="twolw-prompt">type the 2-letter word</div>
+      <div class="twolw-word-display" id="twolw-display">??</div>
+      <input type="text" id="twolw-input" class="twolw-input" maxlength="2" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="__" />
+      <div class="twolw-feedback" id="twolw-feedback"></div>
+      <button class="action twolw-next" id="twolw-next">next →</button>
+    </div>
   </div>
 
 <script>
@@ -173,21 +155,18 @@ function wordProbability(word, denom) {
 const WORD_LIST_URL = "https://raw.githubusercontent.com/katamorphism/searcherism/refs/heads/main/CSW24.txt";
 let wordSet = null;
 let bingoCache = {};
-let twolwList = []; // { word, definition? placeholder }
+let twolwList = [];
 
 async function loadWordList() {
   const res = await fetch(WORD_LIST_URL);
   if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
   const text = await res.text();
   wordSet = new Set(text.split(/\r?\n/).map(w => w.trim().toUpperCase()).filter(Boolean));
-  
-  // extract 2-letter words
   twolwList = [...wordSet].filter(w => w.length === 2).sort();
 }
 
 function buildBingoList(len) {
   if (bingoCache[len]) return;
-  
   const anagramMap = new Map();
   for (const w of wordSet) {
     if (w.length !== len) continue;
@@ -195,11 +174,9 @@ function buildBingoList(len) {
     if (!anagramMap.has(key)) anagramMap.set(key, []);
     anagramMap.get(key).push(w);
   }
-  
   const denom = comb(TOTAL, len);
   const seen = new Set();
   const withProb = [];
-  
   for (const w of wordSet) {
     if (w.length !== len) continue;
     const key = w.split('').sort().join('');
@@ -208,10 +185,8 @@ function buildBingoList(len) {
     const prob = wordProbability(w, denom);
     if (prob > 0) withProb.push({ key, prob });
   }
-  
   withProb.sort((a, b) => b.prob - a.prob);
   withProb.forEach((x, i) => x.rank = i + 1);
-  
   bingoCache[len] = { ranked: withProb, anagramMap };
 }
 
@@ -435,121 +410,90 @@ rangeGo.addEventListener('click', () => {
 len7btn.addEventListener('click', () => { currentLen = 7; len7btn.classList.add('active'); len8btn.classList.remove('active'); if (bingoCache[7]) newRound(); });
 len8btn.addEventListener('click', () => { currentLen = 8; len8btn.classList.add('active'); len7btn.classList.remove('active'); if (bingoCache[8]) newRound(); });
 
-// ── 2LW RECITATION MODE ──────────────────────────────────────────────────────
-let learnedWords = new Set(); // store learned 2-letter words
-let currentQuizWord = null;
-let quizMode = 'testing'; // 'testing' or 'reciting'
+// ── 2LW MINIMAL MODE ─────────────────────────────────────────────────────────
+let learned2lw = new Set();
+let current2lwWord = null;
 
-function loadLearnedFromStorage() {
-  const stored = localStorage.getItem('searcherism_2lw_learned');
-  if (stored) learnedWords = new Set(JSON.parse(stored));
+function load2lwProgress() {
+  const stored = localStorage.getItem('searcherism_2lw');
+  if (stored) learned2lw = new Set(JSON.parse(stored));
 }
 
-function saveLearnedToStorage() {
-  localStorage.setItem('searcherism_2lw_learned', JSON.stringify([...learnedWords]));
+function save2lwProgress() {
+  localStorage.setItem('searcherism_2lw', JSON.stringify([...learned2lw]));
 }
 
-function updateProgress() {
+function update2lwProgress() {
   const total = twolwList.length;
-  const learned = learnedWords.size;
-  document.getElementById('learned-count').textContent = learned;
-  document.getElementById('total-count').textContent = total;
-  const pct = total === 0 ? 0 : Math.round(learned / total * 100);
-  document.getElementById('mastery-pct').textContent = `${pct}%`;
-  document.getElementById('progress-fill').style.width = `${pct}%`;
-  
-  // update grid classes
-  document.querySelectorAll('.twolw-card').forEach(card => {
-    const word = card.dataset.word;
-    if (learnedWords.has(word)) card.classList.add('learned');
-    else card.classList.remove('learned');
-  });
+  const learned = learned2lw.size;
+  const pct = total === 0 ? 0 : (learned / total * 100);
+  document.getElementById('twolw-progress-fill').style.width = `${pct}%`;
+  document.getElementById('twolw-count').textContent = `${learned} / ${total} learned`;
 }
 
-function renderTwolwGrid() {
-  const grid = document.getElementById('twolw-grid');
-  grid.innerHTML = '';
-  for (const word of twolwList) {
-    const card = document.createElement('div');
-    card.className = 'twolw-card';
-    if (learnedWords.has(word)) card.classList.add('learned');
-    card.dataset.word = word;
-    card.innerHTML = `<div class="twolw-word">${word}</div><div class="twolw-def">click to mark</div>`;
-    card.addEventListener('click', () => {
-      if (learnedWords.has(word)) {
-        learnedWords.delete(word);
-      } else {
-        learnedWords.add(word);
-      }
-      saveLearnedToStorage();
-      updateProgress();
-      renderTwolwGrid();
-    });
-    grid.appendChild(card);
+function pickRandom2lw() {
+  const unlearned = twolwList.filter(w => !learned2lw.has(w));
+  if (unlearned.length === 0) {
+    document.getElementById('twolw-display').textContent = '🎉';
+    document.getElementById('twolw-feedback').innerHTML = 'You know all 2-letter words! Reset?';
+    document.getElementById('twolw-input').disabled = true;
+    return null;
   }
-}
-
-function pickRandomUnlearned() {
-  const unlearned = twolwList.filter(w => !learnedWords.has(w));
-  if (unlearned.length === 0) return null;
   return unlearned[Math.floor(Math.random() * unlearned.length)];
 }
 
-function startQuiz() {
-  const nextWord = pickRandomUnlearned();
-  if (!nextWord) {
-    document.getElementById('quiz-definition').textContent = '🎉 ALL LEARNED! 🎉';
-    document.getElementById('quiz-input').disabled = true;
-    document.getElementById('quiz-submit').disabled = true;
-    document.getElementById('quiz-feedback').innerHTML = 'Congratulations! You know all 2-letter words!';
-    return;
-  }
-  currentQuizWord = nextWord;
-  // generate a simple definition/hint (just show the word scrambled or just "???")
-  const scrambled = nextWord.split('').sort().join('');
-  document.getElementById('quiz-definition').innerHTML = `"${nextWord}"<br><span style="font-size:0.8rem; color:#888;">${scrambled === nextWord ? 'same letters' : `scrambled: ${scrambled}`}</span>`;
-  document.getElementById('quiz-input').value = '';
-  document.getElementById('quiz-input').disabled = false;
-  document.getElementById('quiz-submit').disabled = false;
-  document.getElementById('quiz-input').classList.remove('correct', 'wrong');
-  document.getElementById('quiz-feedback').innerHTML = '';
+function display2lwWord() {
+  const word = pickRandom2lw();
+  if (!word) return null;
+  current2lwWord = word;
+  document.getElementById('twolw-display').textContent = '??';
+  document.getElementById('twolw-input').value = '';
+  document.getElementById('twolw-input').disabled = false;
+  document.getElementById('twolw-input').classList.remove('correct', 'wrong');
+  document.getElementById('twolw-feedback').innerHTML = '';
+  document.getElementById('twolw-input').focus();
+  return word;
 }
 
-function checkQuizAnswer() {
-  if (!currentQuizWord) return;
-  const guess = document.getElementById('quiz-input').value.trim().toUpperCase();
-  if (guess === currentQuizWord) {
-    // correct!
-    learnedWords.add(currentQuizWord);
-    saveLearnedToStorage();
-    updateProgress();
-    renderTwolwGrid();
-    document.getElementById('quiz-input').classList.add('correct');
-    document.getElementById('quiz-feedback').innerHTML = '✓ Correct! Learned!';
+function check2lwAnswer() {
+  if (!current2lwWord) return;
+  const guess = document.getElementById('twolw-input').value.trim().toUpperCase();
+  if (guess === current2lwWord) {
+    learned2lw.add(current2lwWord);
+    save2lwProgress();
+    update2lwProgress();
+    document.getElementById('twolw-input').classList.add('correct');
+    document.getElementById('twolw-feedback').innerHTML = '✓ correct!';
     setTimeout(() => {
-      startQuiz();
-    }, 800);
-  } else {
-    document.getElementById('quiz-input').classList.add('wrong');
-    document.getElementById('quiz-feedback').innerHTML = `✗ Incorrect. The word is "${currentQuizWord}". Click next to continue.`;
-    setTimeout(() => document.getElementById('quiz-input').classList.remove('wrong'), 500);
+      display2lwWord();
+    }, 500);
+  } else if (guess.length === 2) {
+    document.getElementById('twolw-input').classList.add('wrong');
+    document.getElementById('twolw-feedback').innerHTML = `✗ "${guess}" is not correct. Try again!`;
+    setTimeout(() => document.getElementById('twolw-input').classList.remove('wrong'), 500);
+    document.getElementById('twolw-input').value = '';
+    document.getElementById('twolw-input').focus();
   }
 }
 
-function skipReveal() {
-  if (!currentQuizWord) return;
-  document.getElementById('quiz-feedback').innerHTML = `The word is "${currentQuizWord}".`;
-  document.getElementById('quiz-input').classList.add('wrong');
-  startQuiz();
+function next2lw() {
+  if (current2lwWord && !learned2lw.has(current2lwWord)) {
+    // skip current word without marking learned
+    document.getElementById('twolw-feedback').innerHTML = `skipped: ${current2lwWord}`;
+    setTimeout(() => {
+      display2lwWord();
+    }, 600);
+  } else {
+    display2lwWord();
+  }
 }
 
-function resetAll() {
-  learnedWords.clear();
-  saveLearnedToStorage();
-  updateProgress();
-  renderTwolwGrid();
-  startQuiz();
-  document.getElementById('quiz-feedback').innerHTML = 'Reset complete! Start learning!';
+function reset2lw() {
+  learned2lw.clear();
+  save2lwProgress();
+  update2lwProgress();
+  display2lwWord();
+  document.getElementById('twolw-feedback').innerHTML = 'reset complete!';
 }
 
 // ── Mode switcher ─────────────────────────────────────────────────────────────
@@ -560,7 +504,6 @@ const btnSearch = document.getElementById('btn-search');
 const btnBingo = document.getElementById('btn-bingo');
 const btn2lw = document.getElementById('btn-2lw');
 let bingoReady = false;
-let twolwReady = false;
 
 btnSearch.addEventListener('click', () => {
   btnSearch.classList.add('active'); btnBingo.classList.remove('active'); btn2lw.classList.remove('active');
@@ -587,20 +530,29 @@ btnBingo.addEventListener('click', async () => {
 btn2lw.addEventListener('click', async () => {
   btn2lw.classList.add('active'); btnSearch.classList.remove('active'); btnBingo.classList.remove('active');
   searchPanel.classList.add('hidden'); bingoPanel.classList.remove('visible'); twolwPanel.classList.add('visible');
-  if (!twolwReady) {
-    try {
-      if (!wordSet) await loadWordList();
-      loadLearnedFromStorage();
-      renderTwolwGrid();
-      updateProgress();
-      startQuiz();
-      twolwReady = true;
-    } catch(e) { document.getElementById('twolw-panel').innerHTML = '<p>could not load CSW24.txt</p>'; }
-  }
-  document.getElementById('quiz-submit').onclick = checkQuizAnswer;
-  document.getElementById('quiz-skip').onclick = skipReveal;
-  document.getElementById('quiz-reset').onclick = resetAll;
-  document.getElementById('quiz-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkQuizAnswer(); });
+  try {
+    if (!wordSet) await loadWordList();
+    load2lwProgress();
+    update2lwProgress();
+    display2lwWord();
+    
+    const input = document.getElementById('twolw-input');
+    const nextBtn = document.getElementById('twolw-next');
+    
+    input.onkeydown = (e) => { if (e.key === 'Enter') check2lwAnswer(); };
+    nextBtn.onclick = next2lw;
+    
+    // add reset button
+    if (!document.getElementById('twolw-reset')) {
+      const resetBtn = document.createElement('button');
+      resetBtn.id = 'twolw-reset';
+      resetBtn.className = 'action';
+      resetBtn.textContent = 'reset progress';
+      resetBtn.style.marginTop = '12px';
+      resetBtn.onclick = reset2lw;
+      document.querySelector('.twolw-quiz').appendChild(resetBtn);
+    }
+  } catch(e) { twolwPanel.innerHTML = '<p>could not load CSW24.txt</p>'; }
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
